@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Actividades</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="title-container">
@@ -42,25 +43,13 @@
                         }
                         document.write('<td><select class="evaluation" onchange="evaluate(this)"><option value=""></option><option value="Muy bien">Muy bien</option><option value="Necesitamos mejorar">Necesitamos mejorar</option><option value="Trabaja más">Trabaja más</option></select></td></tr>');
                     });
-
-                    // Fila de evaluación diaria
-                    document.write('<tr><td>Evaluación diaria</td>');
-                    for (let dia = 1; dia <= 31; dia++) {
-                        const selectId = `daily_evaluation_${dia}`;
-                        document.write(`<td><select id="${selectId}" class="evaluation" onchange="evaluate(this)"><option value=""></option><option value="Muy bien">Muy bien</option><option value="Necesitamos mejorar">Necesitamos mejorar</option><option value="Trabaja más">Trabaja más</option></select></td>`);
-                    }
-                    document.write('<td></td></tr>');
-
-                    // Fila de resultados diarios
-                    document.write('<tr><td>Resultados Diarios</td>');
-                    for (let dia = 1; dia <= 31; dia++) {
-                        const resultId = `daily_result_${dia}`;
-                        document.write(`<td id="${resultId}" class="result"></td>`);
-                    }
-                    document.write('<td></td></tr>');
                 </script>
             </tbody>
         </table>
+    </div>
+    <div class="button-container">
+        <button id="reiniciar" onclick="reiniciar()">Reiniciar</button>
+        <button id="guardar" onclick="guardar()">Guardar</button>
     </div>
     <script src="script.js"></script>
 </body>
