@@ -1,0 +1,114 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.title-container {
+    background-color: #87CEEB; /* Azul cielo */
+    text-align: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.title-container h1 {
+    color: black;
+    font-size: 36px;
+    margin: 0;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 5px;
+    text-align: center;
+}
+
+.button {
+    width: 100%;
+    height: 30px;
+    background-color: gray;
+    border: none;
+    cursor: pointer;
+}
+
+.button.active-red {
+    background-color: red;
+}
+
+.button.active-yellow {
+    background-color: yellow;
+}
+
+.button.active-green {
+    background-color: green;
+}
+
+.evaluation {
+    width: 100%;
+    padding: 5px;
+}
+
+.evaluation option {
+    padding: 5px;
+}
+
+.evaluation.green {
+    background-color: green;
+    color: white;
+}
+
+.evaluation.yellow {
+    background-color: yellow;
+    color: black;
+}
+
+.evaluation.red {
+    background-color: red;
+    color: white;
+}
+
+.result {
+    font-size: 24px;
+}
+
+/* Diseño responsivo */
+@media (max-width: 768px) {
+    th, td {
+        padding: 2px;
+    }
+    .button {
+        height: 20px;
+    }
+    .evaluation {
+        padding: 2px;
+    }
+    .result {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    th, td {
+        font-size: 12px;
+    }
+    .button {
+        height: 15px;
+    }
+    .evaluation {
+        font-size: 12px;
+        padding: 1px;
+    }
+    .result {
+        font-size: 16px;
+    }
+}
