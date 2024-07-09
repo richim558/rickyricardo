@@ -15,15 +15,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 document.getElementById(key).classList.add(buttonState);
             }
         }
-
-        const dailyKey = `daily_evaluation_${i}`;
-        const dailyEvaluationState = localStorage.getItem(dailyKey);
-        if (dailyEvaluationState) {
-            const dailySelect = document.getElementById(dailyKey);
-            dailySelect.value = dailyEvaluationState;
-            dailySelect.classList.add(dailyEvaluationState.toLowerCase().replace(' ', '-'));
-            updateDailyResult(i, dailyEvaluationState);
-        }
     }
 });
 
@@ -71,21 +62,71 @@ function evaluate(select) {
     } else {
         localStorage.removeItem(key);
     }
-
-    // Actualizar la fila de resultados diarios
-    const dia = key.split('_')[2];
-    updateDailyResult(dia, evaluationValue);
 }
 
-function updateDailyResult(dia, evaluationValue) {
-    const resultCell = document.getElementById(`daily_result_${dia}`);
-    if (evaluationValue === 'Muy bien') {
-        resultCell.innerHTML = '😊';
-    } else if (evaluationValue === 'Necesitamos mejorar') {
-        resultCell.innerHTML = '😯';
-    } else if (evaluationValue === 'Trabaja más') {
-        resultCell.innerHTML = '😢';
-    } else {
-        resultCell.innerHTML = '';
-    }
+function reiniciar() {
+    // Reiniciar todos los botones y evaluaciones
+    const buttons = document.querySelectorAll('.button');
+    buttons.forEach(button => {
+        button.classList.remove('active-green', 'active-yellow', 'active-red');
+    });
+
+    const evaluations = document.querySelectorAll('.evaluation');
+    evaluations.forEach(select => {
+        select.value = '';
+        select.classList.remove('green', 'yellow', 'red');
+    });
+
+    // Limpiar el Local Storage
+    localStorage.clear();
+}
+
+function guardar() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Título
+    doc.setFontSize(20);
+    doc.text('Registro de Actividades', 105, 15, null, null, 'center');
+
+    // Configuración de la tabla
+    const headers = ['Actividad', 'Estado'];
+    const data = [];
+
+    // Obtener datos de los botones y evaluaciones
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const actividad = row.querySelector('td:first-child').textContent;
+        const buttons = row.querySelectorAll('.button');
+        const evaluation = row.querySelector('.evaluation');
+
+        let estado = '';
+        buttons.forEach((button, index) => {
+            if (button.classList.contains('active-green')) {
+                estado += `D${index + 1}: Verde, `;
+            } else if (button.classList.contains('active-yellow')) {
+                estado += `D${index + 1}: Amarillo, `;
+            } else if (button.classList.contains('active-red')) {
+                estado += `D${index + 1}: Rojo, `;
+            }
+        });
+
+        if (evaluation.value) {
+            estado += `Evaluación: ${evaluation.value}`;
+        }
+
+        data.push([actividad, estado]);
+    });
+
+    // Generar la tabla en el PDF
+    doc.autoTable({
+        head: [headers],
+        body: data,
+        startY: 25,
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 140 } },
+    });
+
+    // Guardar el PDF
+    doc.save('registro_actividades.pdf');
 }
