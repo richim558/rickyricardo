@@ -13,11 +13,10 @@
 
     <!-- Inicialización de Firebase -->
     <script>
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAAcpfEELlApio9QuDUfv44ZgghMdg-iyA",
             authDomain: "habitos-de-pixeles.firebaseapp.com",
-            databaseURL: "https://habitos-de-pixeles-default-rtdb.firebaseio.com",  // Asegúrate de usar la URL correcta
+            databaseURL: "https://habitos-de-pixeles-default-rtdb.firebaseio.com",
             projectId: "habitos-de-pixeles",
             storageBucket: "habitos-de-pixeles.appspot.com",
             messagingSenderId: "707808161030",
@@ -25,10 +24,7 @@
             measurementId: "G-1XC0WBEFQZ"
         };
 
-        // Inicializar Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const analytics = firebase.analytics();
-        const database = firebase.database();
+        firebase.initializeApp(firebaseConfig);
     </script>
 </head>
 <body>
@@ -40,7 +36,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>Día del Mes</th>
+                    <th>Actividad</th>
+                    <th colspan="31">Día del Mes</th>
+                    <th>Evaluación</th>
                 </tr>
             </thead>
             <tbody>
