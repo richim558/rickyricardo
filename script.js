@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
     const actividades = [
         'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
         'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
@@ -6,15 +6,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         'Dormir 8 horas', 'Ahorrar'
     ];
 
-    const tableHead = document.querySelector('thead tr');
     const tableBody = document.querySelector('tbody');
-
-    // Crear encabezados de días del mes
-    for (let i = 1; i <= 31; i++) {
-        const th = document.createElement('th');
-        th.textContent = i;
-        tableHead.appendChild(th);
-    }
 
     // Crear filas para cada actividad
     actividades.forEach((actividad, actividadIndex) => {
@@ -47,14 +39,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
         tableBody.appendChild(tr);
     });
 
-    // Cargar el estado de los botones y las evaluaciones desde el Local Storage
-    for (let i = 1; i <= 31; i++) {
-        for (let j = 0; j < actividades.length; j++) {
-            const key = `button_${i}_${j}`;
-            const buttonState = localStorage.getItem(key);
-            if (buttonState) {
-                document.getElementById(key).classList.add(buttonState);
-            }
+    // Cargar el estado de los botones y las evaluaciones desde Firebase
+    for (let dia = 1; dia <= 31; dia++) {
+        for (let actividadIndex = 0; actividadIndex < actividades.length; actividadIndex++) {
+            const key = `button_${dia}_${actividadIndex}`;
+            firebase.database().ref('actividades/' + key).once('value').then(snapshot => {
+                const estado = snapshot.val();
+                if (estado) {
+                    document.getElementById(key).classList.add(`active-${estado}`);
+                }
+            });
         }
     }
 });
@@ -72,16 +66,12 @@ function toggleButton(button) {
         button.classList.add('active-green');
     }
 
-    // Guardar el estado del botón en Firebase
     const key = button.id;
     const estado = button.classList.contains('active-green') ? 'green' :
                    button.classList.contains('active-yellow') ? 'yellow' :
-                   button.classList.contains('active-red') ? 'red' : 'gray';
+                   button.classList.contains('active-red') ? 'red' : '';
 
-    firebase.database().ref('actividades/' + key).set(estado)
-        .catch((error) => {
-            console.error("Error al guardar el estado en Firebase:", error);
-        });
+    firebase.database().ref('actividades/' + key).set(estado);
 }
 
 function evaluate(select) {
@@ -95,16 +85,11 @@ function evaluate(select) {
         select.classList.add('red');
     }
 
-    // Guardar el estado de la evaluación en Firebase
     const key = select.id;
-    firebase.database().ref('evaluations/' + key).set(evaluationValue)
-        .catch((error) => {
-            console.error("Error al guardar la evaluación en Firebase:", error);
-        });
+    firebase.database().ref('evaluations/' + key).set(evaluationValue);
 }
 
 function reiniciar() {
-    // Reiniciar todos los botones y evaluaciones
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
         button.classList.remove('active-green', 'active-yellow', 'active-red');
@@ -122,6 +107,5 @@ function reiniciar() {
 }
 
 function guardar() {
-    // No es necesario guardar explícitamente si los cambios ya se guardan automáticamente en Firebase
     console.log("Datos guardados.");
 }
