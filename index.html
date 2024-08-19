@@ -44,7 +44,9 @@
                            button.classList.contains('active-yellow') ? 'yellow' :
                            button.classList.contains('active-red') ? 'red' : 'gray';
 
-            set(ref(database, 'actividades/' + key), estado);
+            set(ref(database, 'actividades/' + key), estado).catch((error) => {
+                console.error("Error al guardar el estado en Firebase:", error);
+            });
         }
 
         function listenForChanges() {
@@ -55,24 +57,41 @@
                     const estado = childSnapshot.val();
                     const button = document.getElementById(key);
 
-                    button.classList.remove('active-green', 'active-yellow', 'active-red', 'active-gray');
-                    if (estado === 'green') {
-                        button.classList.add('active-green');
-                    } else if (estado === 'yellow') {
-                        button.classList.add('active-yellow');
-                    } else if (estado === 'red') {
-                        button.classList.add('active-red');
-                    } else {
-                        button.classList.add('active-gray');
+                    if (button) {
+                        button.classList.remove('active-green', 'active-yellow', 'active-red', 'active-gray');
+                        if (estado === 'green') {
+                            button.classList.add('active-green');
+                        } else if (estado === 'yellow') {
+                            button.classList.add('active-yellow');
+                        } else if (estado === 'red') {
+                            button.classList.add('active-red');
+                        } else {
+                            button.classList.add('active-gray');
+                        }
                     }
                 });
+            }, (error) => {
+                console.error("Error al escuchar cambios en Firebase:", error);
             });
         }
 
-        // Llamar a la función para escuchar cambios en Firebase
+        // Escuchar cambios desde que se carga la página
         listenForChanges();
-    </script>
 
+        // Reiniciar botones (si es necesario)
+        function reiniciar() {
+            document.querySelectorAll('.table-container button').forEach(button => {
+                button.classList.remove('active-green', 'active-yellow', 'active-red', 'active-gray');
+                button.classList.add('active-gray');
+                toggleButton(button); // Actualizar en Firebase
+            });
+        }
+
+        // Guardar el estado de la página (si es necesario)
+        function guardar() {
+            // Aquí iría la lógica para guardar la página como imagen o en otro formato
+        }
+    </script>
 </head>
 <body>
     <div class="title-container">
