@@ -3,57 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habitos de Pixeles</title>
+    <title>Registro de Actividades</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Analytics SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js"></script>
+    <!-- Firebase Realtime Database SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <script type="module">
+        // Importar las funciones que necesitas desde los SDKs de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        // Configuración de Firebase de tu aplicación web
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAcpfEELlApio9QuDUfv44ZgghMdg-iyA",
+            authDomain: "habitos-de-pixeles.firebaseapp.com",
+            projectId: "habitos-de-pixeles",
+            storageBucket: "habitos-de-pixeles.appspot.com",
+            messagingSenderId: "707808161030",
+            appId: "1:707808161030:web:3d720ee75b3a8de712c287",
+            measurementId: "G-1XC0WBEFQZ"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        // Guardar y escuchar cambios en la base de datos
+        function toggleButton(button) {
+            const key = button.id;
+            const estado = button.classList.contains('active-green') ? 'green' :
+                           button.classList.contains('active-yellow') ? 'yellow' :
+                           button.classList.contains('active-red') ? 'red' : 'gray';
+
+            set(ref(database, 'actividades/' + key), estado);
+        }
+
+        function listenForChanges() {
+            const dbRef = ref(database, 'actividades');
+            onValue(dbRef, (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const key = childSnapshot.key;
+                    const estado = childSnapshot.val();
+                    const button = document.getElementById(key);
+
+                    button.classList.remove('active-green', 'active-yellow', 'active-red', 'active-gray');
+                    if (estado === 'green') {
+                        button.classList.add('active-green');
+                    } else if (estado === 'yellow') {
+                        button.classList.add('active-yellow');
+                    } else if (estado === 'red') {
+                        button.classList.add('active-red');
+                    } else {
+                        button.classList.add('active-gray');
+                    }
+                });
+            });
+        }
+
+        // Llamar a la función para escuchar cambios en Firebase
+        listenForChanges();
+    </script>
+
 </head>
 <body>
-    <div id="auth-container">
-        <button id="login-btn">Iniciar Sesión</button>
-        <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
-    </div>
-
     <div class="title-container">
         <h1>HABITOS DE PIXELES</h1>
         <h2>Hecho por: Ricky Guapo :)</h2>
     </div>
-
-    <div id="calendar-controls">
-        <input type="text" id="calendar-name" placeholder="Nombre del calendario">
-        <button id="new-calendar-btn">Nuevo Calendario</button>
-        <button id="save-calendar-btn">Guardar Mes</button>
-        <button id="load-calendar-btn">Cargar Calendario</button>
-    </div>
-
     <div class="table-container">
-        <table id="habits-table">
+        <table>
             <thead>
                 <tr>
                     <th>Día del Mes</th>
-                    <!-- Los números del 1 al 31 se generarán con JavaScript -->
+                    <!-- Generar los números del 1 al 31 -->
+                    <script>
+                        for (let i = 1; i <= 31; i++) {
+                            document.write(`<th>${i}</th>`);
+                        }
+                    </script>
                     <th>Evaluación</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Las filas de actividades se generarán con JavaScript -->
+                <!-- Generar las filas para cada actividad -->
+                <script>
+                    const actividades = [
+                        'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
+                        'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
+                        'Ayudar', 'Tiempo solo', 'Inglés', 'Leer', 'Planificar día', 'Meditar',
+                        'Dormir 8 horas', 'Ahorrar'
+                    ];
+
+                    actividades.forEach((actividad, actividadIndex) => {
+                        document.write(`<tr><td>${actividad}</td>`);
+                        for (let dia = 1; dia <= 31; dia++) {
+                            const buttonId = `button_${dia}_${actividadIndex}`;
+                            document.write(`<td><button id="${buttonId}" onclick="toggleButton(this)" class="button"></button></td>`);
+                        }
+                        document.write('<td><select class="evaluation" onchange="evaluate(this)"><option value=""></option><option value="Muy bien">Muy bien</option><option value="Necesitamos mejorar">Necesitamos mejorar</option><option value="Trabaja más">Trabaja más</option></select></td></tr>');
+                    });
+                </script>
             </tbody>
         </table>
     </div>
-
     <div class="button-container">
-        <button id="reiniciar">Reiniciar</button>
-        <button id="exportar-pdf">Exportar PDF</button>
+        <button id="reiniciar" onclick="reiniciar()">Reiniciar</button>
+        <button id="guardar" onclick="guardar()">Guardar</button>
     </div>
-
-    <div id="calendar-history">
-        <h3>Historial de Calendarios</h3>
-        <ul id="calendar-list"></ul>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
