@@ -6,6 +6,47 @@ document.addEventListener('DOMContentLoaded', (event) => {
         'Dormir 8 horas', 'Ahorrar'
     ];
 
+    const tableHead = document.querySelector('thead tr');
+    const tableBody = document.querySelector('tbody');
+
+    // Crear encabezados de días del mes
+    for (let i = 1; i <= 31; i++) {
+        const th = document.createElement('th');
+        th.textContent = i;
+        tableHead.appendChild(th);
+    }
+
+    // Crear filas para cada actividad
+    actividades.forEach((actividad, actividadIndex) => {
+        const tr = document.createElement('tr');
+        const tdActividad = document.createElement('td');
+        tdActividad.textContent = actividad;
+        tr.appendChild(tdActividad);
+
+        for (let dia = 1; dia <= 31; dia++) {
+            const td = document.createElement('td');
+            const button = document.createElement('button');
+            button.id = `button_${dia}_${actividadIndex}`;
+            button.classList.add('button');
+            button.addEventListener('click', () => toggleButton(button));
+            td.appendChild(button);
+            tr.appendChild(td);
+        }
+
+        const tdEval = document.createElement('td');
+        const select = document.createElement('select');
+        select.classList.add('evaluation');
+        select.innerHTML = `<option value=""></option>
+                            <option value="Muy bien">Muy bien</option>
+                            <option value="Necesitamos mejorar">Necesitamos mejorar</option>
+                            <option value="Trabaja más">Trabaja más</option>`;
+        select.addEventListener('change', () => evaluate(select));
+        tdEval.appendChild(select);
+        tr.appendChild(tdEval);
+
+        tableBody.appendChild(tr);
+    });
+
     // Cargar el estado de los botones y las evaluaciones desde el Local Storage
     for (let i = 1; i <= 31; i++) {
         for (let j = 0; j < actividades.length; j++) {
@@ -31,17 +72,16 @@ function toggleButton(button) {
         button.classList.add('active-green');
     }
 
-    // Guardar el estado del botón en el Local Storage
+    // Guardar el estado del botón en Firebase
     const key = button.id;
-    if (button.classList.contains('active-green')) {
-        localStorage.setItem(key, 'active-green');
-    } else if (button.classList.contains('active-yellow')) {
-        localStorage.setItem(key, 'active-yellow');
-    } else if (button.classList.contains('active-red')) {
-        localStorage.setItem(key, 'active-red');
-    } else {
-        localStorage.removeItem(key);
-    }
+    const estado = button.classList.contains('active-green') ? 'green' :
+                   button.classList.contains('active-yellow') ? 'yellow' :
+                   button.classList.contains('active-red') ? 'red' : 'gray';
+
+    firebase.database().ref('actividades/' + key).set(estado)
+        .catch((error) => {
+            console.error("Error al guardar el estado en Firebase:", error);
+        });
 }
 
 function evaluate(select) {
@@ -55,13 +95,12 @@ function evaluate(select) {
         select.classList.add('red');
     }
 
-    // Guardar el estado de la evaluación en el Local Storage
+    // Guardar el estado de la evaluación en Firebase
     const key = select.id;
-    if (evaluationValue) {
-        localStorage.setItem(key, evaluationValue);
-    } else {
-        localStorage.removeItem(key);
-    }
+    firebase.database().ref('evaluations/' + key).set(evaluationValue)
+        .catch((error) => {
+            console.error("Error al guardar la evaluación en Firebase:", error);
+        });
 }
 
 function reiniciar() {
@@ -69,23 +108,20 @@ function reiniciar() {
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
         button.classList.remove('active-green', 'active-yellow', 'active-red');
+        firebase.database().ref('actividades/' + button.id).remove();
     });
 
     const evaluations = document.querySelectorAll('.evaluation');
     evaluations.forEach(select => {
         select.value = '';
         select.classList.remove('green', 'yellow', 'red');
+        firebase.database().ref('evaluations/' + select.id).remove();
     });
 
-    // Limpiar el Local Storage
-    localStorage.clear();
+    console.log("Datos reiniciados.");
 }
 
 function guardar() {
-    html2canvas(document.body).then(canvas => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'captura_actividades.png';
-        link.click();
-    });
+    // No es necesario guardar explícitamente si los cambios ya se guardan automáticamente en Firebase
+    console.log("Datos guardados.");
 }
