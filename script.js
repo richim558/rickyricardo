@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', (event) => {
     const actividades = [
         'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
         'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
@@ -6,49 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
         'Dormir 8 horas', 'Ahorrar'
     ];
 
-    const tableBody = document.querySelector('tbody');
-
-    // Crear filas para cada actividad
-    actividades.forEach((actividad, actividadIndex) => {
-        const tr = document.createElement('tr');
-        const tdActividad = document.createElement('td');
-        tdActividad.textContent = actividad;
-        tr.appendChild(tdActividad);
-
-        for (let dia = 1; dia <= 31; dia++) {
-            const td = document.createElement('td');
-            const button = document.createElement('button');
-            button.id = `button_${dia}_${actividadIndex}`;
-            button.classList.add('button');
-            button.addEventListener('click', () => toggleButton(button));
-            td.appendChild(button);
-            tr.appendChild(td);
-        }
-
-        const tdEval = document.createElement('td');
-        const select = document.createElement('select');
-        select.classList.add('evaluation');
-        select.innerHTML = `<option value=""></option>
-                            <option value="Muy bien">Muy bien</option>
-                            <option value="Necesitamos mejorar">Necesitamos mejorar</option>
-                            <option value="Trabaja más">Trabaja más</option>`;
-        select.addEventListener('change', () => evaluate(select));
-        tdEval.appendChild(select);
-        tr.appendChild(tdEval);
-
-        tableBody.appendChild(tr);
-    });
-
-    // Cargar el estado de los botones y las evaluaciones desde Firebase
-    for (let dia = 1; dia <= 31; dia++) {
-        for (let actividadIndex = 0; actividadIndex < actividades.length; actividadIndex++) {
-            const key = `button_${dia}_${actividadIndex}`;
-            firebase.database().ref('actividades/' + key).once('value').then(snapshot => {
-                const estado = snapshot.val();
-                if (estado) {
-                    document.getElementById(key).classList.add(`active-${estado}`);
-                }
-            });
+    // Cargar el estado de los botones y las evaluaciones desde el Local Storage
+    for (let i = 1; i <= 31; i++) {
+        for (let j = 0; j < actividades.length; j++) {
+            const key = button_${i}_${j};
+            const buttonState = localStorage.getItem(key);
+            if (buttonState) {
+                document.getElementById(key).classList.add(buttonState);
+            }
         }
     }
 });
@@ -66,12 +31,17 @@ function toggleButton(button) {
         button.classList.add('active-green');
     }
 
+    // Guardar el estado del botón en el Local Storage
     const key = button.id;
-    const estado = button.classList.contains('active-green') ? 'green' :
-                   button.classList.contains('active-yellow') ? 'yellow' :
-                   button.classList.contains('active-red') ? 'red' : '';
-
-    firebase.database().ref('actividades/' + key).set(estado);
+    if (button.classList.contains('active-green')) {
+        localStorage.setItem(key, 'active-green');
+    } else if (button.classList.contains('active-yellow')) {
+        localStorage.setItem(key, 'active-yellow');
+    } else if (button.classList.contains('active-red')) {
+        localStorage.setItem(key, 'active-red');
+    } else {
+        localStorage.removeItem(key);
+    }
 }
 
 function evaluate(select) {
@@ -85,27 +55,37 @@ function evaluate(select) {
         select.classList.add('red');
     }
 
+    // Guardar el estado de la evaluación en el Local Storage
     const key = select.id;
-    firebase.database().ref('evaluations/' + key).set(evaluationValue);
+    if (evaluationValue) {
+        localStorage.setItem(key, evaluationValue);
+    } else {
+        localStorage.removeItem(key);
+    }
 }
 
 function reiniciar() {
+    // Reiniciar todos los botones y evaluaciones
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
         button.classList.remove('active-green', 'active-yellow', 'active-red');
-        firebase.database().ref('actividades/' + button.id).remove();
     });
 
     const evaluations = document.querySelectorAll('.evaluation');
     evaluations.forEach(select => {
         select.value = '';
         select.classList.remove('green', 'yellow', 'red');
-        firebase.database().ref('evaluations/' + select.id).remove();
     });
 
-    console.log("Datos reiniciados.");
+    // Limpiar el Local Storage
+    localStorage.clear();
 }
 
 function guardar() {
-    console.log("Datos guardados.");
+    html2canvas(document.body).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'captura_actividades.png';
+        link.click();
+    });
 }
