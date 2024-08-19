@@ -5,7 +5,7 @@ body {
 }
 
 .title-container {
-    background-color: #87CEEB;
+    background-color: #87CEEB; /* Azul cielo */
     text-align: center;
     padding: 20px 0;
     margin-bottom: 20px;
@@ -39,7 +39,7 @@ th, td {
     background-color: gray;
     border: none;
     cursor: pointer;
-    border-radius: 50%;
+    border-radius: 50%; /* Hace los botones circulares */
 }
 
 .button.active-red {
