@@ -39,7 +39,7 @@ th, td {
     background-color: gray;
     border: none;
     cursor: pointer;
-    border-radius: 50%; /* Hace los botones circulares */
+    border-radius: 50%;
 }
 
 .button.active-red {
