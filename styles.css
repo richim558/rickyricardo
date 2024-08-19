@@ -2,11 +2,10 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
 }
 
 .title-container {
-    background-color: #87CEEB;
+    background-color: #87CEEB; /* Azul cielo */
     text-align: center;
     padding: 20px 0;
     margin-bottom: 20px;
@@ -18,41 +17,9 @@ body {
     margin: 0;
 }
 
-.title-container h2 {
-    color: #333;
-    font-size: 18px;
-    margin-top: 10px;
-}
-
-#auth-container, #calendar-controls {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#auth-container button, #calendar-controls button {
-    margin: 0 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-#calendar-name {
-    padding: 10px;
-    font-size: 16px;
-    margin-right: 10px;
-}
-
 .table-container {
-    width: 95%;
-    margin: 0 auto;
+    width: 100%;
     overflow-x: auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 table {
@@ -61,36 +28,55 @@ table {
 }
 
 th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    border: 1px solid #000;
+    padding: 5px;
     text-align: center;
 }
 
-th {
-    background-color: #f2f2f2;
-}
-
 .button {
-    width: 25px;
-    height: 25px;
-    background-color: #ccc;
+    width: 30px;
+    height: 30px;
+    background-color: gray;
     border: none;
     cursor: pointer;
-    border-radius: 50%;
+    border-radius: 50%; /* Hace los botones circulares */
 }
 
-.button.active-red { background-color: #ff6b6b; }
-.button.active-yellow { background-color: #feca57; }
-.button.active-green { background-color: #5cd85a; }
+.button.active-red {
+    background-color: red;
+}
+
+.button.active-yellow {
+    background-color: yellow;
+}
+
+.button.active-green {
+    background-color: green;
+}
 
 .evaluation {
     width: 100%;
     padding: 5px;
 }
 
-.evaluation.green { background-color: #5cd85a; color: white; }
-.evaluation.yellow { background-color: #feca57; color: black; }
-.evaluation.red { background-color: #ff6b6b; color: white; }
+.evaluation option {
+    padding: 5px;
+}
+
+.evaluation.green {
+    background-color: green;
+    color: white;
+}
+
+.evaluation.yellow {
+    background-color: yellow;
+    color: black;
+}
+
+.evaluation.red {
+    background-color: red;
+    color: white;
+}
 
 .button-container {
     display: flex;
@@ -98,49 +84,35 @@ th {
     margin-top: 20px;
 }
 
-#reiniciar, #exportar-pdf {
+#reiniciar, #guardar {
     margin: 0 10px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
 }
 
-#calendar-history {
-    width: 95%;
-    margin: 20px auto;
-    background-color: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-#calendar-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-#calendar-list li {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    cursor: pointer;
-}
-
-#calendar-list li:hover {
-    background-color: #f0f0f0;
-}
-
+/* Diseño responsivo */
 @media (max-width: 768px) {
-    th, td { padding: 5px; }
-    .button { width: 20px; height: 20px; }
-    .evaluation { padding: 2px; }
+    th, td {
+        padding: 2px;
+    }
+    .button {
+        height: 20px;
+    }
+    .evaluation {
+        padding: 2px;
+    }
 }
 
 @media (max-width: 480px) {
-    th, td { font-size: 12px; padding: 3px; }
-    .button { width: 15px; height: 15px; }
-    .evaluation { font-size: 12px; padding: 1px; }
+    th, td {
+        font-size: 12px;
+    }
+    .button {
+        height: 15px;
+    }
+    .evaluation {
+        font-size: 12px;
+        padding: 1px;
+    }
 }
