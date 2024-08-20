@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Cargar el estado de los botones y las evaluaciones desde el Local Storage
     for (let i = 1; i <= 31; i++) {
         for (let j = 0; j < actividades.length; j++) {
-            const key = button_${i}_${j};
+            const key = `button_${i}_${j}`;
             const buttonState = localStorage.getItem(key);
             if (buttonState) {
                 document.getElementById(key).classList.add(buttonState);
