@@ -96,7 +96,7 @@ async function evaluate(select) {
     }
 }
 
-function reiniciar() {
+async function reiniciar() {
     // Reiniciar todos los botones y evaluaciones
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
@@ -110,14 +110,13 @@ function reiniciar() {
     });
 
     // Limpiar la base de datos
-    supabase
+    const { error } = await supabase
         .from('actividades')
-        .delete()
-        .then(({ error }) => {
-            if (error) {
-                console.error('Error al limpiar la base de datos', error);
-            }
-        });
+        .delete();
+
+    if (error) {
+        console.error('Error al limpiar la base de datos', error);
+    }
 }
 
 function guardar() {
