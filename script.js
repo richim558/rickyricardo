@@ -1,6 +1,6 @@
 // Inicialización de Supabase
 const supabaseUrl = 'https://phiqzvcnhfsxdnjyifys.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sIjoiYW5vbiIsImlhdCI6MTcyNDE3NzU3NiwiZXhwIjoyMDM5NzUzNTc2fQ.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzc1NzYsImV4cCI6MjAzOTc1MzU3Nn0.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
 let supabase;
 
 // Espera que el DOM esté cargado antes de inicializar Supabase
