@@ -32,19 +32,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function toggleButton(button) {
-    if (button.classList.contains('active-green')) {
-        button.classList.remove('active-green');
-        button.classList.add('active-yellow');
-    } else if (button.classList.contains('active-yellow')) {
-        button.classList.remove('active-yellow');
-        button.classList.add('active-red');
-    } else if (button.classList.contains('active-red')) {
+    const currentClass = ['active-green', 'active-yellow', 'active-red'];
+    const currentState = button.className.split(' ').find(c => currentClass.includes(c));
+
+    if (currentState === 'active-green') {
+        button.classList.replace('active-green', 'active-yellow');
+    } else if (currentState === 'active-yellow') {
+        button.classList.replace('active-yellow', 'active-red');
+    } else if (currentState === 'active-red') {
         button.classList.remove('active-red');
     } else {
         button.classList.add('active-green');
     }
 
-    const estado = button.className.split(' ').find(c => c.startsWith('active-')) || '';
+    const estado = button.className.split(' ').find(c => currentClass.includes(c)) || '';
 
     const [_, dia, actividad] = button.id.split('_');
     supabase.from('actividades').upsert({
