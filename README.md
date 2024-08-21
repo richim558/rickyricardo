@@ -1,2 +1,0 @@
-# rickyricardo
-pagina personal
