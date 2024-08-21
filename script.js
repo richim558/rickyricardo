@@ -1,130 +1,106 @@
-// Inicializar Supabase
+// Inicialización de Supabase
 const supabaseUrl = 'https://phiqzvcnhfsxdnjyifys.supabase.co';
-const supabaseKey = 'tu-api-key';  // Reemplaza esto con tu API key real
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzc1NzYsImV4cCI6MjAzOTc1MzU3Nn0.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// Array de actividades
-const actividades = [
-    'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
-    'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
-    'Ayudar', 'Tiempo solo', 'Inglés', 'Leer', 'Planificar día', 'Meditar',
-    'Dormir 8 horas', 'Ahorrar'
-];
-
-// Cargar el estado inicial de la página
+// Esperar a que el DOM esté cargado
 document.addEventListener('DOMContentLoaded', async () => {
-    await cargarEstadoDesdeBaseDeDatos();
-});
+    const actividades = [
+        'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
+        'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
+        'Ayudar', 'Tiempo solo', 'Inglés', 'Leer', 'Planificar día', 'Meditar',
+        'Dormir 8 horas', 'Ahorrar'
+    ];
 
-async function cargarEstadoDesdeBaseDeDatos() {
+    // Recuperar estado de los botones desde Supabase
     for (let dia = 1; dia <= 31; dia++) {
-        for (let i = 0; i < actividades.length; i++) {
+        for (let actividadIndex = 0; actividadIndex < actividades.length; actividadIndex++) {
             const { data, error } = await supabase
                 .from('actividades')
-                .select('estado, evaluacion')
+                .select('estado')
                 .eq('dia', dia)
-                .eq('actividad', i)
+                .eq('actividad', actividadIndex)
                 .single();
 
-            if (data) {
-                const buttonId = `button_${dia}_${i}`;
-                const selectId = `select_${dia}_${i}`;
-
-                // Restaurar estado de los botones
-                if (data.estado) {
-                    const button = document.getElementById(buttonId);
-                    button.classList.add(data.estado);
-                }
-
-                // Restaurar evaluaciones
-                if (data.evaluacion) {
-                    const select = document.getElementById(selectId);
-                    select.value = data.evaluacion;
-                    actualizarColorEvaluacion(select);
-                }
+            if (error) {
+                console.error(error);
+            } else if (data && data.estado) {
+                const button = document.getElementById(`button_${dia}_${actividadIndex}`);
+                button.classList.add(data.estado);
             }
         }
     }
-}
+});
 
+// Función para alternar el color del botón
 function toggleButton(button) {
-    const estados = ['active-green', 'active-yellow', 'active-red'];
-    const currentClass = estados.find(estado => button.classList.contains(estado));
-
-    if (currentClass) {
-        button.classList.remove(currentClass);
-        const nextClass = estados[(estados.indexOf(currentClass) + 1) % estados.length];
-        button.classList.add(nextClass);
+    if (button.classList.contains('active-green')) {
+        button.classList.remove('active-green');
+        button.classList.add('active-yellow');
+    } else if (button.classList.contains('active-yellow')) {
+        button.classList.remove('active-yellow');
+        button.classList.add('active-red');
+    } else if (button.classList.contains('active-red')) {
+        button.classList.remove('active-red');
     } else {
         button.classList.add('active-green');
     }
 
-    const estadoActual = button.classList.contains('active-green') ? 'active-green' :
-                        button.classList.contains('active-yellow') ? 'active-yellow' :
-                        button.classList.contains('active-red') ? 'active-red' : '';
+    const estado = button.className.split(' ').find(c => c.startsWith('active-')) || '';
 
-    guardarEstadoEnBaseDeDatos(button.id, estadoActual);
+    // Guardar el estado en Supabase
+    const [_, dia, actividad] = button.id.split('_');
+    supabase.from('actividades').upsert({
+        dia: parseInt(dia),
+        actividad: parseInt(actividad),
+        estado: estado
+    }).then(({ error }) => {
+        if (error) console.error(error);
+    });
 }
 
-async function guardarEstadoEnBaseDeDatos(id, estado) {
-    const [ , dia, actividadIndex ] = id.split('_');
-    const { data, error } = await supabase
-        .from('actividades')
-        .upsert({ dia: parseInt(dia), actividad: parseInt(actividadIndex), estado: estado });
-
-    if (error) console.error('Error al guardar estado:', error);
-}
-
+// Función para manejar la evaluación
 function evaluate(select) {
-    actualizarColorEvaluacion(select);
-    guardarEvaluacionEnBaseDeDatos(select.id, select.value);
-}
-
-function actualizarColorEvaluacion(select) {
+    const evaluationValue = select.value;
     select.classList.remove('green', 'yellow', 'red');
-
-    if (select.value === 'Muy bien') {
+    if (evaluationValue === 'Muy bien') {
         select.classList.add('green');
-    } else if (select.value === 'Necesitamos mejorar') {
+    } else if (evaluationValue === 'Necesitamos mejorar') {
         select.classList.add('yellow');
-    } else if (select.value === 'Trabaja más') {
+    } else if (evaluationValue === 'Trabaja más') {
         select.classList.add('red');
     }
+
+    // Guardar la evaluación en Supabase
+    const [_, dia, actividad] = select.id.split('_');
+    supabase.from('actividades').upsert({
+        dia: parseInt(dia),
+        actividad: parseInt(actividad),
+        evaluacion: evaluationValue
+    }).then(({ error }) => {
+        if (error) console.error(error);
+    });
 }
 
-async function guardarEvaluacionEnBaseDeDatos(id, evaluacion) {
-    const [ , dia, actividadIndex ] = id.split('_');
-    const { data, error } = await supabase
-        .from('actividades')
-        .upsert({ dia: parseInt(dia), actividad: parseInt(actividadIndex), evaluacion: evaluacion });
-
-    if (error) console.error('Error al guardar evaluación:', error);
-}
-
-function reiniciar() {
+// Función para reiniciar
+async function reiniciar() {
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
-        button.className = 'button';
+        button.classList.remove('active-green', 'active-yellow', 'active-red');
     });
 
     const evaluations = document.querySelectorAll('.evaluation');
     evaluations.forEach(select => {
         select.value = '';
-        actualizarColorEvaluacion(select);
+        select.classList.remove('green', 'yellow', 'red');
     });
 
-    limpiarBaseDeDatos();
+    // Eliminar todos los registros en Supabase
+    const { error } = await supabase.from('actividades').delete();
+    if (error) console.error(error);
 }
 
-async function limpiarBaseDeDatos() {
-    const { error } = await supabase
-        .from('actividades')
-        .delete()
-        .not('id', 'is', null);
-
-    if (error) console.error('Error al limpiar la base de datos:', error);
-}
-
+// Función para guardar como imagen
 function guardar() {
     html2canvas(document.body).then(canvas => {
         const link = document.createElement('a');
