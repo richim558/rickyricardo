@@ -1,9 +1,13 @@
 // Inicialización de Supabase
 const supabaseUrl = 'https://phiqzvcnhfsxdnjyifys.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sIjoiYW5vbiIsImlhdCI6MTcyNDE3NzU3NiwiZXhwIjoyMDM5NzUzNTc2fQ.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+let supabase;
 
+// Espera que el DOM esté cargado antes de inicializar Supabase
 document.addEventListener('DOMContentLoaded', async () => {
+    // Inicializar Supabase
+    supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
     const actividades = [
         'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
         'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
@@ -22,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .single();
 
             if (error) {
-                console.error(error);
+                console.error('Error recuperando el estado:', error);
             } else if (data && data.estado) {
                 const button = document.getElementById(`button_${dia}_${actividadIndex}`);
                 button.classList.add(data.estado);
@@ -32,6 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function toggleButton(button) {
+    if (!supabase) {
+        console.error('Supabase no está inicializado.');
+        return;
+    }
+
     const currentClass = ['active-green', 'active-yellow', 'active-red'];
     const currentState = button.className.split(' ').find(c => currentClass.includes(c));
 
@@ -53,11 +62,16 @@ function toggleButton(button) {
         actividad: parseInt(actividad),
         estado: estado
     }).then(({ error }) => {
-        if (error) console.error(error);
+        if (error) console.error('Error guardando el estado:', error);
     });
 }
 
 function evaluate(select) {
+    if (!supabase) {
+        console.error('Supabase no está inicializado.');
+        return;
+    }
+
     const evaluationValue = select.value;
     select.classList.remove('green', 'yellow', 'red');
     if (evaluationValue === 'Muy bien') {
@@ -74,11 +88,16 @@ function evaluate(select) {
         actividad: parseInt(actividad),
         evaluacion: evaluationValue
     }).then(({ error }) => {
-        if (error) console.error(error);
+        if (error) console.error('Error guardando la evaluación:', error);
     });
 }
 
 async function reiniciar() {
+    if (!supabase) {
+        console.error('Supabase no está inicializado.');
+        return;
+    }
+
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
         button.classList.remove('active-green', 'active-yellow', 'active-red');
@@ -91,7 +110,7 @@ async function reiniciar() {
     });
 
     const { error } = await supabase.from('actividades').delete();
-    if (error) console.error(error);
+    if (error) console.error('Error reiniciando:', error);
 }
 
 function guardar() {
