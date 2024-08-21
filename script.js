@@ -1,9 +1,8 @@
 // Inicialización de Supabase
 const supabaseUrl = 'https://phiqzvcnhfsxdnjyifys.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzc1NzYsImV4cCI6MjAzOTc1MzU3Nn0.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sIjoiYW5vbiIsImlhdCI6MTcyNDE3NzU3NiwiZXhwIjoyMDM5NzUzNTc2fQ.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// Esperar a que el DOM esté cargado
 document.addEventListener('DOMContentLoaded', async () => {
     const actividades = [
         'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Función para alternar el color del botón
 function toggleButton(button) {
     if (button.classList.contains('active-green')) {
         button.classList.remove('active-green');
@@ -48,7 +46,6 @@ function toggleButton(button) {
 
     const estado = button.className.split(' ').find(c => c.startsWith('active-')) || '';
 
-    // Guardar el estado en Supabase
     const [_, dia, actividad] = button.id.split('_');
     supabase.from('actividades').upsert({
         dia: parseInt(dia),
@@ -59,7 +56,6 @@ function toggleButton(button) {
     });
 }
 
-// Función para manejar la evaluación
 function evaluate(select) {
     const evaluationValue = select.value;
     select.classList.remove('green', 'yellow', 'red');
@@ -71,7 +67,6 @@ function evaluate(select) {
         select.classList.add('red');
     }
 
-    // Guardar la evaluación en Supabase
     const [_, dia, actividad] = select.id.split('_');
     supabase.from('actividades').upsert({
         dia: parseInt(dia),
@@ -82,7 +77,6 @@ function evaluate(select) {
     });
 }
 
-// Función para reiniciar
 async function reiniciar() {
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
@@ -95,12 +89,10 @@ async function reiniciar() {
         select.classList.remove('green', 'yellow', 'red');
     });
 
-    // Eliminar todos los registros en Supabase
     const { error } = await supabase.from('actividades').delete();
     if (error) console.error(error);
 }
 
-// Función para guardar como imagen
 function guardar() {
     html2canvas(document.body).then(canvas => {
         const link = document.createElement('a');
