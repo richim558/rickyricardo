@@ -1,13 +1,4 @@
-// Inicialización de Supabase
-const supabaseUrl = 'https://phiqzvcnhfsxdnjyifys.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaXF6dmNuaGZzeGRuanlpZnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzc1NzYsImV4cCI6MjAzOTc1MzU3Nn0.MewpFDIzO59FMUoskbPLwABLwtIV-SvBRK6HFex1ycw';
-let supabase;
-
-// Espera que el DOM esté cargado antes de inicializar Supabase
-document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializar Supabase
-    supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
+document.addEventListener('DOMContentLoaded', (event) => {
     const actividades = [
         'Despertar temprano', 'Ejercicio', 'Deberes domésticos', 'Cuidado personal',
         'Respiración profunda', 'Vitaminas', 'Tarea', 'Comer sano', '2 litros de agua',
@@ -15,63 +6,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         'Dormir 8 horas', 'Ahorrar'
     ];
 
-    // Recuperar estado de los botones desde Supabase
-    for (let dia = 1; dia <= 31; dia++) {
-        for (let actividadIndex = 0; actividadIndex < actividades.length; actividadIndex++) {
-            const { data, error } = await supabase
-                .from('actividades')
-                .select('estado')
-                .eq('dia', dia)
-                .eq('actividad', actividadIndex)
-                .single();
-
-            if (error) {
-                console.error('Error recuperando el estado:', error);
-            } else if (data && data.estado) {
-                const button = document.getElementById(`button_${dia}_${actividadIndex}`);
-                button.classList.add(data.estado);
+    // Cargar el estado de los botones y las evaluaciones desde el Local Storage
+    for (let i = 1; i <= 31; i++) {
+        for (let j = 0; j < actividades.length; j++) {
+            const key = `button_${i}_${j}`;
+            const buttonState = localStorage.getItem(key);
+            if (buttonState) {
+                document.getElementById(key).classList.add(buttonState);
             }
         }
     }
 });
 
 function toggleButton(button) {
-    if (!supabase) {
-        console.error('Supabase no está inicializado.');
-        return;
-    }
-
-    const currentClass = ['active-green', 'active-yellow', 'active-red'];
-    const currentState = button.className.split(' ').find(c => currentClass.includes(c));
-
-    if (currentState === 'active-green') {
-        button.classList.replace('active-green', 'active-yellow');
-    } else if (currentState === 'active-yellow') {
-        button.classList.replace('active-yellow', 'active-red');
-    } else if (currentState === 'active-red') {
+    if (button.classList.contains('active-green')) {
+        button.classList.remove('active-green');
+        button.classList.add('active-yellow');
+    } else if (button.classList.contains('active-yellow')) {
+        button.classList.remove('active-yellow');
+        button.classList.add('active-red');
+    } else if (button.classList.contains('active-red')) {
         button.classList.remove('active-red');
     } else {
         button.classList.add('active-green');
     }
 
-    const estado = button.className.split(' ').find(c => currentClass.includes(c)) || '';
-
-    const [_, dia, actividad] = button.id.split('_');
-    supabase.from('actividades').upsert({
-        dia: parseInt(dia),
-        actividad: parseInt(actividad),
-        estado: estado
-    }).then(({ error }) => {
-        if (error) console.error('Error guardando el estado:', error);
-    });
+    // Guardar el estado del botón en el Local Storage
+    const key = button.id;
+    if (button.classList.contains('active-green')) {
+        localStorage.setItem(key, 'active-green');
+    } else if (button.classList.contains('active-yellow')) {
+        localStorage.setItem(key, 'active-yellow');
+    } else if (button.classList.contains('active-red')) {
+        localStorage.setItem(key, 'active-red');
+    } else {
+        localStorage.removeItem(key);
+    }
 }
 
 function evaluate(select) {
-    if (!supabase) {
-        console.error('Supabase no está inicializado.');
-        return;
-    }
-
     const evaluationValue = select.value;
     select.classList.remove('green', 'yellow', 'red');
     if (evaluationValue === 'Muy bien') {
@@ -82,22 +55,17 @@ function evaluate(select) {
         select.classList.add('red');
     }
 
-    const [_, dia, actividad] = select.id.split('_');
-    supabase.from('actividades').upsert({
-        dia: parseInt(dia),
-        actividad: parseInt(actividad),
-        evaluacion: evaluationValue
-    }).then(({ error }) => {
-        if (error) console.error('Error guardando la evaluación:', error);
-    });
+    // Guardar el estado de la evaluación en el Local Storage
+    const key = select.id;
+    if (evaluationValue) {
+        localStorage.setItem(key, evaluationValue);
+    } else {
+        localStorage.removeItem(key);
+    }
 }
 
-async function reiniciar() {
-    if (!supabase) {
-        console.error('Supabase no está inicializado.');
-        return;
-    }
-
+function reiniciar() {
+    // Reiniciar todos los botones y evaluaciones
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
         button.classList.remove('active-green', 'active-yellow', 'active-red');
@@ -109,8 +77,8 @@ async function reiniciar() {
         select.classList.remove('green', 'yellow', 'red');
     });
 
-    const { error } = await supabase.from('actividades').delete();
-    if (error) console.error('Error reiniciando:', error);
+    // Limpiar el Local Storage
+    localStorage.clear();
 }
 
 function guardar() {
