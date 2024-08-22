@@ -2,18 +2,19 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    font-size: 1rem;
 }
 
 .title-container {
-    background-color: #87CEEB; /* Azul cielo */
+    background-color: #87CEEB;
     text-align: center;
-    padding: 20px 0;
-    margin-bottom: 20px;
+    padding: 1.25rem 0;
+    margin-bottom: 1.25rem;
 }
 
 .title-container h1 {
     color: black;
-    font-size: 36px;
+    font-size: 2.25rem;
     margin: 0;
 }
 
@@ -25,21 +26,22 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 0.875rem;
 }
 
 th, td {
     border: 1px solid #000;
-    padding: 5px;
+    padding: 0.3125rem;
     text-align: center;
 }
 
 .button {
-    width: 30px;
-    height: 30px;
+    width: 2rem;
+    height: 2rem;
     background-color: gray;
     border: none;
     cursor: pointer;
-    border-radius: 50%; /* Hace los botones circulares */
+    border-radius: 50%;
 }
 
 .button.active-red {
@@ -56,11 +58,11 @@ th, td {
 
 .evaluation {
     width: 100%;
-    padding: 5px;
+    padding: 0.3125rem;
 }
 
 .evaluation option {
-    padding: 5px;
+    padding: 0.3125rem;
 }
 
 .evaluation.green {
@@ -81,38 +83,45 @@ th, td {
 .button-container {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 1.25rem;
 }
 
 #reiniciar, #guardar {
-    margin: 0 10px;
-    padding: 10px 20px;
-    font-size: 16px;
+    margin: 0 0.625rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 1rem;
     cursor: pointer;
 }
 
 /* Diseño responsivo */
 @media (max-width: 768px) {
     th, td {
-        padding: 2px;
+        padding: 0.125rem;
+        font-size: 0.75rem;
     }
     .button {
-        height: 20px;
+        width: 1.5rem;
+        height: 1.5rem;
     }
     .evaluation {
-        padding: 2px;
+        padding: 0.125rem;
     }
 }
 
 @media (max-width: 480px) {
     th, td {
-        font-size: 12px;
+        font-size: 0.75rem;
     }
     .button {
-        height: 15px;
+        width: 1.25rem;
+        height: 1.25rem;
     }
     .evaluation {
-        font-size: 12px;
-        padding: 1px;
+        font-size: 0.75rem;
+        padding: 0.0625rem;
+    }
+
+    .title-container h1 {
+        font-size: 1.75rem;
     }
 }
